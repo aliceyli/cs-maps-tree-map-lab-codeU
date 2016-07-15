@@ -73,6 +73,18 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		
 		// the actual search
         // TODO: Fill this in.
+        Node n = root;
+        while (n != null) {
+        	if (k.compareTo(n.key) < 0) {
+        		n = n.left;
+        	}
+        	else if (k.compareTo(n.key) > 0) {
+        		n = n.right;
+        	}
+        	else {
+        		return n;
+        	}
+        }
         return null;
 	}
 
@@ -90,9 +102,27 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		return target.equals(obj);
 	}
 
+	public boolean traverseTree(Node n, Object target) {
+
+		if (n == null) {
+			return false;
+		}
+		if (traverseTree(n.left, target)) {
+        	return true;
+    	}
+    	if (equals(target,n.value)) {
+			return true;
+		}
+    	if (traverseTree(n.right, target)) {
+       		return true;
+    	}
+    	return false;
+	}
+
 	@Override
 	public boolean containsValue(Object target) {
-		return false;
+        
+		return traverseTree(root,target);
 	}
 
 	@Override
@@ -117,8 +147,15 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+        addInOrder(root, set);
 		return set;
+	}
+
+	private void addInOrder(Node node, Set<K> set) {
+	    if (node == null) return;
+	    	addInOrder(node.left, set);
+	    	set.add(node.key);
+	    	addInOrder(node.right, set);        
 	}
 
 	@Override
@@ -135,8 +172,32 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+        // TODO: Fill this in
+
+         Comparable<? super K> k = (Comparable<? super K>) key;
+	    int cmp = k.compareTo(node.key);
+	 
+	    if (cmp < 0) {
+	        if (node.left == null) {
+	            node.left = new Node(key, value);
+	            size++;
+	            return null;
+	        } else {
+	            return putHelper(node.left, key, value);
+	        }
+	    }
+	    if (cmp > 0) {
+	        if (node.right == null) {
+	            node.right = new Node(key, value);
+	            size++;
+	            return null;
+	        } else {
+	            return putHelper(node.right, key, value);
+	        }
+	    }
+	    V oldValue = node.value;
+	    node.value = value;
+	    return oldValue;
 	}
 
 	@Override
